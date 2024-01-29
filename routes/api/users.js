@@ -4,6 +4,6 @@ const router = express.Router();
 const tokenHelper = require('../../helpers/token');
 
 
-router.get("/", tokenHelper.authenticateUser, usersController.getUsers);
+router.get("/", tokenHelper.authenticateEntity, usersController.getUsers);
 
 module.exports = router;
