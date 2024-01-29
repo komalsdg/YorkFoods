@@ -4,14 +4,12 @@ require("app-module-path").addPath(__dirname);
  const express = require('express');
  const path = require('path');
  const cookieParser = require('cookie-parser');
- const passport = require('passport')
  const bodyParser = require("body-parser");
  const logger = require('morgan');
 
  const pathfinderUI = require('pathfinder-ui')
 
  const mainRouter = require('./routes');
- const { JwtStrategy } = require('./passport');
 
  const app = express();
 
@@ -24,10 +22,7 @@ require("app-module-path").addPath(__dirname);
  }));
  app.use(bodyParser.json())
 
- // For authentication 
  app.use(cookieParser());
- app.use(passport.initialize());
- passport.use('jwt', JwtStrategy);
 
  // For serving static assets
  app.use('/public',express.static(path.join(__dirname, 'public')));
