@@ -3,22 +3,27 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 module.exports = {
-  authenticateUser: async (req, res, next) => {
+  authenticateEntity: async (req, res, next) => {
     const token = req.get("X-Auth-Token");
     const email = req.get("X-Auth-Email");
-    let user =
-      email &&
-      (await prisma.user.findUnique({
-        where: { email: email },
-      }));
+    const type = req.get("X-Auth-Type"); //Pass either "user" or "restaurant"
+
+    let entity;
+    if (type === "user") {
+      entity = await prisma.user.findUnique({ where: { email } });
+    } else if (type === "restaurant") {
+      entity = await prisma.restaurant.findUnique({ where: { email } });
+    } else {
+      return res.status(400).json({ error: "Invalid entity type" });
+    }
 
     if (
-      user != null &&
-      token === user.authenticationToken &&
+      entity &&
+      token === entity.authenticationToken &&
       verifyToken(token) &&
-      user.isBlocked === false
+      !entity.isBlocked
     ) {
-      req.user = user;
+      req.entity = entity;
       next();
     } else {
       return res.status(401).json({

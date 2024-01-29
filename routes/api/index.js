@@ -7,6 +7,6 @@ const express = require('express');
 
  router.use('/users', users);
  router.use('/users', registrations);
- router.use('/users', sessions);
+ router.use('/', sessions);
 
  module.exports = router; 
