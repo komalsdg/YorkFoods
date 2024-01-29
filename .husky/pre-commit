@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Get the current branch name
+current_branch=$(git symbolic-ref --short HEAD)
+
+# Check if the current branch is "main"
+if [ "$current_branch" = "main" ]; then
+  echo "Commits to the 'main' branch are not allowed."
+  exit 1
+fi
+
+# If not on the main branch, continue with the commit
+exit 0
