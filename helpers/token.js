@@ -1,4 +1,4 @@
-const models = require('models')
+const prisma = require("../prismaClient");
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
@@ -9,9 +9,15 @@ module.exports = {
 
     let user =
       email &&
-      (await models.Users.findOne({
+      (await prisma.users.findUnique({
         where: { email: email },
-        attributes: ['id', 'name', 'email', 'token', 'status'],
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          authenticationToken: true,
+          isVerified: true
+        },
       }))
 
     if (
