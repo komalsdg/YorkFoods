@@ -41,3 +41,19 @@ model User {
   updatedAt           DateTime  @updatedAt
 }
 
+model Restaurant {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  passwordHash       String
+  name               String
+  subdomain          String    @unique
+  cuisineType        Cuisine?  @default(null)
+  location           String
+  isVerified         Boolean   @default(false)
+  isBlocked          Boolean   @default(false)
+  resetPasswordToken String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+
