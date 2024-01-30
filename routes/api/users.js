@@ -5,5 +5,6 @@ const tokenHelper = require('../../helpers/token');
 
 
 router.get("/", tokenHelper.authenticateEntity, usersController.getUsers);
+router.get("/:id", tokenHelper.authenticateEntity, usersController.getUserProfile);
 
 module.exports = router;
