@@ -27,33 +27,32 @@ enum Cuisine {
 }
 
 model User {
-  id                  Int       @id @default(autoincrement())
-  email               String    @unique
+  id                  Int      @id @default(autoincrement())
+  email               String   @unique
   passwordHash        String
   name                String
   cuisinePreference   Cuisine? @default(null)
   dieticianData       Json?
-  isVerified          Boolean   @default(false)
-  isBlocked           Boolean   @default(false)
+  isVerified          Boolean  @default(false)
+  isBlocked           Boolean  @default(false)
   authenticationToken String?
   resetPasswordToken  String?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model Restaurant {
-  id                 Int       @id @default(autoincrement())
-  email              String    @unique
-  passwordHash       String
-  name               String
-  subdomain          String    @unique
-  cuisineType        Cuisine?  @default(null)
-  location           String
-  isVerified         Boolean   @default(false)
-  isBlocked          Boolean   @default(false)
-  resetPasswordToken String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  id                  Int      @id @default(autoincrement())
+  email               String   @unique
+  passwordHash        String
+  name                String
+  subdomain           String   @unique
+  cuisineType         Cuisine? @default(null)
+  location            String
+  isVerified          Boolean  @default(false)
+  isBlocked           Boolean  @default(false)
+  authenticationToken String?
+  resetPasswordToken  String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
-
-
