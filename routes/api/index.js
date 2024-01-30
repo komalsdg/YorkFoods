@@ -6,7 +6,7 @@ const express = require('express');
  const sessions = require('./sessions');
 
  router.use('/users', users);
- router.use('/users', registrations);
+ router.use('/register', registrations);
  router.use('/', sessions);
 
  module.exports = router; 
