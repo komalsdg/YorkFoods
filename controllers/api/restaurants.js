@@ -1,5 +1,8 @@
 const prisma = require("../../prismaClient");
-const { restaurantSchema } = require("../../validations/restaurant");
+const {
+  restaurantSchema,
+  restaurantUpdateSchema,
+} = require("../../validations/restaurant");
 
 //list restaurants which are active
 const getRestaurants = async (req, res) => {
@@ -53,25 +56,17 @@ const getRestaurantProfile = async (req, res) => {
 
 //update restaurant profile by restaurant,admin
 const updateRestaurantProfile = async (req, res) => {
-    const body = req.body;
+  const body = req.body;
   try {
-    await restaurantSchema.validate(req.body);
-    const { id } = req.params;
-    const restaurant = prisma.restaurant.findUnique({where: {
-        id: parseInt(id),
-      }});
+    await restaurantUpdateSchema.validate(req.body);
+
+    const { id, ...restaurantData } = req.entity;
+
     const updateRestaurant = await prisma.restaurant.update({
       where: { id: id },
-      select: {
-      email: true,
-      name: true,
-      cuisineType: true,
-      location: true,
-      subdomain: true
-    },
       data: {
-        ...restaurant,
-        body
+        ...restaurantData,
+        ...body,
       },
     });
     res.send(updateRestaurant);
@@ -88,10 +83,10 @@ const archiveRestaurant = async (req, res) => {
     const archiveRestaurant = await prisma.restaurant.update({
       where: { id: parsetInt(id) },
       select: {
-        deletedAt: true
+        deletedAt: true,
       },
       data: {
-        deletedAt: new Date()
+        deletedAt: new Date(),
       },
     });
     res.send(archiveRestaurant);
