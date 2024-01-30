@@ -81,7 +81,7 @@ const archiveRestaurant = async (req, res) => {
   try {
     const { id } = req.params;
     const archiveRestaurant = await prisma.restaurant.update({
-      where: { id: parsetInt(id) },
+      where: { id: parseInt(id) },
       select: {
         deletedAt: true,
       },
