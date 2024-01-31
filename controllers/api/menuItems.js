@@ -19,7 +19,7 @@ const getMenuItemsByRestaurants = async (req, res) => {
         nutritionalValues: true,
       },
       where: {
-        restaurantId: parseInt(id),
+        restaurantId: parseInt(id), // extra condition to hide archived menu items from users
       },
     });
     res.json(menuItems);
@@ -96,16 +96,13 @@ const updateMenuItem = async (req, res) => {
 const archiveMenuItem = async (req, res) => {
   try {
     const { id } = req.params;
-    const archiveMenuItem = await prisma.menuitem.update({
+    const archivedMenuItem = await prisma.menuItem.update({
       where: { id: parseInt(id) },
-      select: {
-        deletedAt: true,
-      },
       data: {
         deletedAt: new Date(),
       },
     });
-    res.send(archiveMenuItem);
+    res.send(archivedMenuItem);
   } catch (error) {
     console.log("Error in archiveMenuItem", error.message);
     res.status(500).send({ error: error.message });

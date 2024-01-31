@@ -7,6 +7,6 @@ const tokenHelper = require('../../helpers/token');
 router.get("/restaurants/:id/menu-items", tokenHelper.authenticateEntity, menuItemsController.getMenuItemsByRestaurants);
 router.post("/restaurants/menu-items", tokenHelper.authenticateEntity, menuItemsController.insertMenuItem);
 router.put("/restaurants/menu-items/:id", tokenHelper.authenticateEntity, menuItemsController.updateMenuItem);
-router.delete("/:id", tokenHelper.authenticateEntity, menuItemsController.archiveMenuItem);
+router.delete("/restaurants/menu-items/:id", tokenHelper.authenticateEntity, menuItemsController.archiveMenuItem);
 
 module.exports = router;
