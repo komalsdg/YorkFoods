@@ -62,18 +62,30 @@ const insertMenuItem = async (req, res) => {
 const updateMenuItem = async (req, res) => {
   const body = req.body;
   try {
-    await menuItemUpdateSchema.validate(req.body);
+    await menuItemUpdateSchema.validate(body);
 
-    const { id, ...menuItemData } = req.entity;
+    const menuItemId = parseInt(req.params.id);
+    const restaurantId = req.entity.id;
 
-    const updateMenuItem = await prisma.menuitem.update({
-      where: { id: id },
+    const menuItem = await prisma.menuItem.findUnique({
+      where: { id: menuItemId },
+    });
+
+    if (!menuItem || menuItem.restaurantId !== restaurantId) {
+      return res.status(404).send({
+        error: "Menu item not found or does not belong to the restaurant",
+      });
+    }
+
+    const updatedMenuItem = await prisma.menuItem.update({
+      where: { id: menuItemId },
       data: {
-        ...menuItemData,
+        ...menuItem,
         ...body,
       },
     });
-    res.send(updateMenuItem);
+
+    res.send(updatedMenuItem);
   } catch (error) {
     console.log("Error in updateMenuItem", error.message);
     res.status(500).send({ error: error.message });

@@ -7,10 +7,14 @@ const menuItemSchema = yup
     description: yup.string().required(),
     price: yup.number().required(),
     quantity: yup.number().required(),
-    nutritionalValues: yup.object().shape({
-      protein: yup.string().required(),
-      calories: yup.string().required(),
-    }),
+    nutritionalValues: yup
+      .object()
+      .shape({
+        protein: yup.string().required(),
+        calories: yup.string().required(),
+      })
+      .required()
+      .strict(true),
   })
   .noUnknown();
 
@@ -21,10 +25,13 @@ const menuItemUpdateSchema = yup
     description: yup.string(),
     price: yup.number(),
     quantity: yup.number(),
-    nutritionalValues: yup.object().shape({
-      protein: yup.string().required(),
-      calories: yup.string().required(),
-    }),
+    nutritionalValues: yup
+      .object()
+      .shape({
+        protein: yup.string().required(),
+        calories: yup.string().required(),
+      })
+      .strict(true),
   })
   .noUnknown();
 
