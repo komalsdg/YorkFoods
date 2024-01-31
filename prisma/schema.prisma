@@ -39,6 +39,7 @@ model User {
   resetPasswordToken  String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  Orders              Order[]
 }
 
 model Restaurant {
@@ -57,6 +58,7 @@ model Restaurant {
   updatedAt          DateTime   @updatedAt
   deletedAt          DateTime?
   menuItems          MenuItem[]
+  Orders             Order[]
 }
 
 model MenuItem {
@@ -70,6 +72,31 @@ model MenuItem {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
+  OrderItems        OrderItem[]
 
   restaurant Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
+model Order {
+  id           Int        @id @default(autoincrement())
+  userId       Int        
+  restaurantId Int        
+  totalPrice   Float
+  status       String
+  createdAt    DateTime   @default(now())
+  OrderItems   OrderItem[]
+
+  user         User       @relation(fields: [userId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int      
+  menuItemId Int      
+  quantity   Int
+  price      Float
+
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
 }
