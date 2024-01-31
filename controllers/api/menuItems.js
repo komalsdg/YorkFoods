@@ -4,7 +4,7 @@ const {
     menuItemUpdateSchema,
 } = require("../../validations/menuItem");
 
-//list all menus by restaurants
+//list a restaurant's menu items
 const getMenuItemsByRestaurants = async (req, res) => {
     try {
         const { id } = req.params;
