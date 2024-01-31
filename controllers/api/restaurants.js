@@ -1,8 +1,5 @@
 const prisma = require("../../prismaClient");
-const {
-  restaurantSchema,
-  restaurantUpdateSchema,
-} = require("../../validations/restaurant");
+const { restaurantUpdateSchema } = require("../../validations/restaurant");
 
 //list restaurants which are active
 const getRestaurants = async (req, res) => {
@@ -58,7 +55,7 @@ const getRestaurantProfile = async (req, res) => {
 const updateRestaurantProfile = async (req, res) => {
   const body = req.body;
   try {
-    await restaurantUpdateSchema.validate(req.body);
+    await restaurantUpdateSchema.validate(req.body, { stripUnknown: false });
 
     const { id, ...restaurantData } = req.entity;
 

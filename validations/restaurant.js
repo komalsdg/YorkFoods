@@ -18,35 +18,35 @@ const restaurantSchema = yup.object().shape({
       "MEDITERRANEAN",
       "CARIBBEAN",
       "CONTINENTAL",
-      null,
     ])
     .required(),
-  location: yup.string().email().required(),
-  subdomain: yup.string().email().required(),
+  location: yup.string().required(),
+  subdomain: yup.string().required(),
 });
 
-const restaurantUpdateSchema = yup.object().shape({
-  name: yup.string(),
-  email: yup.string().email(),
-  cuisineType: yup
-    .string()
-    .oneOf([
-      "ITALIAN",
-      "MEXICAN",
-      "CHINESE",
-      "JAPANESE",
-      "INDIAN",
-      "AMERICAN",
-      "FRENCH",
-      "KOREAN",
-      "BRITISH",
-      "MEDITERRANEAN",
-      "CARIBBEAN",
-      "CONTINENTAL",
-      null,
-    ]),
-  location: yup.string().email(),
-  subdomain: yup.string().email(),
-});
+const restaurantUpdateSchema = yup
+  .object()
+  .shape({
+    name: yup.string(),
+    cuisineType: yup
+      .string()
+      .oneOf([
+        "ITALIAN",
+        "MEXICAN",
+        "CHINESE",
+        "JAPANESE",
+        "INDIAN",
+        "AMERICAN",
+        "FRENCH",
+        "KOREAN",
+        "BRITISH",
+        "MEDITERRANEAN",
+        "CARIBBEAN",
+        "CONTINENTAL",
+      ]),
+    location: yup.string(),
+    subdomain: yup.string(),
+  })
+  .noUnknown();
 
 module.exports = { restaurantSchema, restaurantUpdateSchema };
