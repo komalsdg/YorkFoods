@@ -8,7 +8,7 @@ const {
 const getMenuItemsByRestaurants = async (req, res) => {
     try {
         const { id } = req.params;
-        const menuItems = await prisma.menuitem.findUnique({
+        const menuItems = await prisma.menuItem.findMany({
             select: {
                 id: true,
                 restaurantId: true,
