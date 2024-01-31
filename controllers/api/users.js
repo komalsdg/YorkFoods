@@ -58,6 +58,44 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const updateUserPassword = async (req, res) => {
+  const { id } = req.params;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    
+    if (!user || user.passwordHash !== currentPassword) {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        passwordHash: newPassword,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        cuisinePreference: true,
+      },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user password:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 
 
@@ -65,4 +103,5 @@ module.exports = {
   getUsers,
   getUserProfile,
   updateUserProfile,
+  updateUserPassword
 };
