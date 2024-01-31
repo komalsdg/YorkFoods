@@ -55,7 +55,7 @@ model Restaurant {
   resetPasswordToken String?
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
-  deletedAt           DateTime?
+  deletedAt          DateTime?
   menuItems          MenuItem[]
 }
 

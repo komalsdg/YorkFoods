@@ -75,23 +75,21 @@ const updateRestaurantProfile = async (req, res) => {
 
 //delete restaurant by restaurant,admin
 const archiveRestaurant = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const archiveRestaurant = await prisma.restaurant.update({
-      where: { id: parseInt(id) },
-      select: {
-        deletedAt: true,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-    res.send(archiveRestaurant);
-  } catch (error) {
-    console.log("Error in archiveRestaurant", error.message);
-    res.status(500).send({ error: error.message });
-  }
-};
+    try {
+      const { id } = req.params;
+      const archivedRestaurant = await prisma.restaurant.update({
+        where: { id: parseInt(id) },
+        data: {
+          deletedAt: new Date(),
+        }
+      });
+      res.send(archivedRestaurant);
+    } catch (error) {
+      console.log("Error in archiveRestaurant", error.message);
+      res.status(500).send({ error: error.message });
+    }
+  };
+  
 
 module.exports = {
   getRestaurants,
