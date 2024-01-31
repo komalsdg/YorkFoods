@@ -1,17 +1,31 @@
 const yup = require("yup");
 
-const menuItemSchema = yup.object().shape({
-  name: yup.string().required(),
-  restautantId: yup.number().required(),
-  price: yup.number().required(),
-  quantity: yup.number().required()
-});
+const menuItemSchema = yup
+  .object()
+  .shape({
+    name: yup.string().required(),
+    description: yup.string().required(),
+    price: yup.number().required(),
+    quantity: yup.number().required(),
+    nutritionalValues: yup.object().shape({
+      protein: yup.string().required(),
+      calories: yup.string().required(),
+    }),
+  })
+  .noUnknown();
 
-const menuItemUpdateSchema = yup.object().shape({
+const menuItemUpdateSchema = yup
+  .object()
+  .shape({
     name: yup.string(),
-    restautantId: yup.number(),
+    description: yup.string(),
     price: yup.number(),
-    quantity: yup.number()
-});
+    quantity: yup.number(),
+    nutritionalValues: yup.object().shape({
+      protein: yup.string().required(),
+      calories: yup.string().required(),
+    }),
+  })
+  .noUnknown();
 
 module.exports = { menuItemSchema, menuItemUpdateSchema };
