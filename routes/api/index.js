@@ -5,10 +5,12 @@ const express = require('express');
  const registrations = require('./registrations');
  const restaurants = require('./restaurants');
  const sessions = require('./sessions');
+const menuItems = require('./menuItems');
 
  router.use('/users', users);
  router.use('/register', registrations);
  router.use('/restaurants', restaurants);
  router.use('/', sessions);
+ router.use('/',menuItems);
 
  module.exports = router; 
