@@ -11,6 +11,6 @@ const menuItems = require('./menuItems');
  router.use('/register', registrations);
  router.use('/restaurants', restaurants);
  router.use('/', sessions);
- router.use('/menuItems',menuItems);
+ router.use('/',menuItems);
 
  module.exports = router; 
