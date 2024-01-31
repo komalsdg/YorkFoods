@@ -5,5 +5,6 @@ const tokenHelper = require('../../helpers/token');
 
 
 router.get("/", tokenHelper.authenticateEntity, usersController.getUsers);
+router.get("/fetch-medical-data", tokenHelper.authenticateEntity, usersController.fetchMedicalData);
 
 module.exports = router;
