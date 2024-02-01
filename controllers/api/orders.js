@@ -24,7 +24,31 @@ const getUserOrders = async (req, res) => {
     });
     res.json(orders);
   } catch (error) {
-    console.log("Error in getOrders", error.message);
+    console.log("Error in getUserOrders", error.message);
+    res.status(500).send({ error: error.message });
+  }
+};
+
+//list orders per restaurants
+const getRestaurantsOrders = async (req, res) => {
+  try {
+    const restaurant = req.entity;
+    const orders = await prisma.order.findMany({
+      select: {
+        id: true,
+        userId: true,
+        restaurantId: true,
+        totalPrice: true,
+        status: true,
+        OrderItems: true,
+      },
+      where: {
+        restaurantId: restaurant.id,
+      },
+    });
+    res.json(orders);
+  } catch (error) {
+    console.log("Error in getRestaurantsOrders", error.message);
     res.status(500).send({ error: error.message });
   }
 };
@@ -110,5 +134,5 @@ const updateOrderStatus = async (req, res) => {
 };
 
 module.exports = {
-  getUserOrders, insertOrder
+  getUserOrders, insertOrder, getRestaurantsOrders, updateOrderStatus
 };
