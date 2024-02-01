@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "node",
+            "name": "nodemon",
+            "request": "launch",
+            "program": "${workspaceFolder}/server.js"
+        }
+    ]
+}

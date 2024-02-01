@@ -54,7 +54,6 @@ const getRestaurantsOrders = async (req, res) => {
 const insertOrder = async (req, res) => {
   try {
     await orderSchema.validate(req.body, { stripUnknown: true });
-debugger;
     const { restaurantId, menuItemIds } = req.body;
 
     // Fetch menu items to validate they belong to the same restaurant
@@ -66,13 +65,24 @@ debugger;
       },
     });
 
+    //Fetch user data
+    const userData = prisma.user.findUnique({
+      where: {
+        id: parseInt(req.entity.id),
+      },
+      select: {
+        id: true,
+        email: true,
+        dieticianData: true,
+      },
+    });
+
     // Check if all menu items belong to the specified restaurant and if the count matches
     const allItemsMatchRestaurant = menuItems.every(
       (item) => item.restaurantId === restaurantId
     );
     const itemCountMatches = menuItems.length === menuItemIds.length;
     //calculate sum of nutritionalValues of menuitems and check if it is less than the user's preference limit
-
     if (!allItemsMatchRestaurant) {
       return res.status(400).send({
         error: "Not all menu items belong to the specified restaurant.",
@@ -84,73 +94,73 @@ debugger;
           "The number of items passed does not match the number of items available.",
       });
     }
-    else if (!underPriscribedLimit){
+    else if (!underPriscribedLimit(userData, menuItems)) {
       return res.status(400).send({
         error:
           "Your order items's nutiritional values are greater than your prferenced dietition value",
       });
     }
+   
+      // Fix logic to calculate total price
+      // const totalPrice = menuItems.reduce((acc, currentItem) => {
+      //   const quantity = menuItemIds.find(item => item.menuItemId === currentItem.id).quantity;
+      //   return acc + (currentItem.price * quantity);
+      // }, 0);
 
-    // Fix logic to calculate total price
-    // const totalPrice = menuItems.reduce((acc, currentItem) => {
-    //   const quantity = menuItemIds.find(item => item.menuItemId === currentItem.id).quantity;
-    //   return acc + (currentItem.price * quantity);
-    // }, 0);
+      const totalPrice = 100;
 
-    const totalPrice = 100;
+      // Create order
+      const newOrder = await prisma.order.create({
+        data: {
+          userId: req.entity.id,
+          restaurantId,
+          totalPrice,
+          status: "created",
+        },
+      });
 
-    // Create order
-    const newOrder = await prisma.order.create({
-      data: {
-        userId: req.entity.id,
-        restaurantId,
-        totalPrice,
-        status: "created",
-      },
-    });
+      // Prepare order items data
+      const orderItemsData = menuItems.map((item) => ({
+        orderId: newOrder.id,
+        menuItemId: item.id,
+        quantity: menuItemIds.find((menuItem) => menuItem.menuItemId === item.id)
+          .quantity,
+        price: item.price,
+      }));
 
-    // Prepare order items data
-    const orderItemsData = menuItems.map((item) => ({
-      orderId: newOrder.id,
-      menuItemId: item.id,
-      quantity: menuItemIds.find((menuItem) => menuItem.menuItemId === item.id)
-        .quantity,
-      price: item.price,
-    }));
+      // Insert order items
+      const newOrderItems = await prisma.orderItem.createMany({
+        data: orderItemsData,
+        skipDuplicates: true,
+      });
 
-    // Insert order items
-    const newOrderItems = await prisma.orderItem.createMany({
-      data: orderItemsData,
-      skipDuplicates: true,
-    });
-
-    res.json({ order: newOrder, orderItemsCount: newOrderItems });
+      res.json({ order: newOrder, orderItemsCount: newOrderItems });
+    
   } catch (error) {
     console.error("Error in insertOrder:", error.message);
     res.status(500).send({ error: error.message });
   }
+
 };
 
-function underPriscribedLimit(userId, menuItems) {
+function underPriscribedLimit(userData, menuItems) {
+
   let result;
-  const userData = prisma.user.findUnique({
-    where: {
-      id: parseInt(userId),
-    },
-    select: {
-      id: true,
-      dieticianData: true,
-    },
-  });
 
   if (menuItems && userData) {
+
+    console.log(userData);
     const menuItemsSum = menuItems.reduce((sum, item) => {
-      return sum + item.nutritionalValues;
-    }, 0);
-    const userDataSum = userData.dieticianData.reduce((sum, value) => {
-      return sum + value;
-    }, 0);
-    result = menuItemsSum < userDataSum;
+      return {
+        protein: sum.protein + item.nutritionalValues.protein,
+        calories: sum.calories + item.nutritionalValues.calories,
+      };
+    }, { protein: 0, calories: 0 });
+
+    const userDataSum = userData.dieticianData;
+
+    result = menuItemsSum.protein < userDataSum.protein && menuItemsSum.calories < userDataSum.calories;
+
   }
 
   return result;
