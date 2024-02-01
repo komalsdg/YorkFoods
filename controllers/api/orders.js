@@ -1,9 +1,6 @@
 const prisma = require("../../prismaClient");
 
-const {
-  orderSchema,
-  orderUpdateSchema,
-} = require("../../validations/orders");
+const { orderSchema, orderUpdateSchema } = require("../../validations/orders");
 
 //list a user's order
 const getUserOrders = async (req, res) => {
@@ -55,49 +52,75 @@ const getRestaurantsOrders = async (req, res) => {
 
 //insert order
 const insertOrder = async (req, res) => {
-  let newOrder;
   try {
-    const {
-      userId,
-      restaurantId,
-      totalPrice,
-      status
-    } = req.body;
-    await orderSchema.validate(req.body, { stripUnknown: false });
-    //order
-    newOrder = await prisma.order.create({
+    await orderSchema.validate(req.body, { stripUnknown: true });
+
+    const { restaurantId, menuItemIds } = req.body;
+
+    // Fetch menu items to validate they belong to the same restaurant
+    const menuItems = await prisma.menuItem.findMany({
+      where: {
+        id: {
+          in: menuItemIds.map((item) => item.menuItemId),
+        },
+      },
+    });
+
+    // Check if all menu items belong to the specified restaurant and if the count matches
+    const allItemsMatchRestaurant = menuItems.every(
+      (item) => item.restaurantId === restaurantId
+    );
+    const itemCountMatches = menuItems.length === menuItemIds.length;
+    if (!allItemsMatchRestaurant) {
+      return res.status(400).send({
+        error: "Not all menu items belong to the specified restaurant.",
+      });
+    } else if (!itemCountMatches) {
+      return res.status(400).send({
+        error:
+          "The number of items passed does not match the number of items available.",
+      });
+    }
+
+    // Fix logic to calculate total price
+    // const totalPrice = menuItems.reduce((acc, currentItem) => {
+    //   const quantity = menuItemIds.find(item => item.menuItemId === currentItem.id).quantity;
+    //   return acc + (currentItem.price * quantity);
+    // }, 0);
+
+    const totalPrice = 100;
+
+    // Create order
+    const newOrder = await prisma.order.create({
       data: {
         userId: req.entity.id,
         restaurantId,
         totalPrice,
-        status: 'created'
+        status: "created",
       },
     });
-  } catch (error) {
-    console.log("Error in insertOrder", error.message);
-    res.status(500).send({ error: error.message });
-  }
-  try {
 
-    // Adding a orderID to every list
-    const orderId = 'OrderID';
-    const orderValue = newOrder.orderId;
+    // Prepare order items data
+    const orderItemsData = menuItems.map((item) => ({
+      orderId: newOrder.id,
+      menuItemId: item.id,
+      quantity: menuItemIds.find((menuItem) => menuItem.menuItemId === item.id)
+        .quantity,
+      price: item.price,
+    }));
 
-    for (const data of data_list) {
-      data[orderId] = orderValue;
-    }
-    //orderitem insert
-    const newOrderItems = await prisma.orderitem.createMany({
-      data: orderItems,
-      skipDuplicates: true
+    // Insert order items
+    const newOrderItems = await prisma.orderItem.createMany({
+      data: orderItemsData,
+      skipDuplicates: true,
     });
-    res.json(newOrder);
+
+    res.json({ order: newOrder, orderItemsCount: newOrderItems });
   } catch (error) {
-    console.log("Error in insertOrderItem", error.message);
+    console.error("Error in insertOrder:", error.message);
     res.status(500).send({ error: error.message });
   }
 };
-
 
 //update order status by restautantid
 const updateOrderStatus = async (req, res) => {
@@ -134,5 +157,8 @@ const updateOrderStatus = async (req, res) => {
 };
 
 module.exports = {
-  getUserOrders, insertOrder, getRestaurantsOrders, updateOrderStatus
+  getUserOrders,
+  insertOrder,
+  getRestaurantsOrders,
+  updateOrderStatus,
 };
