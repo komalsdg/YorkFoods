@@ -12,7 +12,7 @@ const orders = require('./orders');
  router.use('/register', registrations);
  router.use('/restaurants', restaurants);
  router.use('/', sessions);
- router.use('/menuItems',menuItems);
- router.use('/orders',orders);
+ router.use('/',menuItems);
+ router.use('/',orders);
 
  module.exports = router; 
