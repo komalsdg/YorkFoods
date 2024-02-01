@@ -103,6 +103,7 @@
     "ms": "^2.0.0",
     "negotiator": "^0.6.3",
     "next-tick": "^1.1.0",
+    "node-cron": "^3.0.3",
     "nodemon": "^3.0.3",
     "nopt": "^7.2.0",
     "object-inspect": "^1.13.1",
