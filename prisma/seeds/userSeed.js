@@ -32,6 +32,11 @@ async function seedUsers() {
         cuisinePreference,
         authenticationToken,
         dieticianData,
+        wallet: {
+          create: {
+            balance: 500,
+          },
+        },
       },
     });
   }

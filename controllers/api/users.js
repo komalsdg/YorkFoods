@@ -153,6 +153,19 @@ const updatePassword = async (req, res) => {
   }
 };
 
+const getUserWalletBalance = async (req, res) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: parseInt(req.entity.id),
+    },
+    select: {
+      wallet: true,
+    },
+  });
+
+  res.json({ balance: user.wallet.balance });
+};
+
 module.exports = {
   getUsers,
   fetchMedicalData,
@@ -160,4 +173,5 @@ module.exports = {
   updateUserProfile,
   resetPassword,
   updatePassword,
+  getUserWalletBalance,
 };

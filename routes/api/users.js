@@ -10,8 +10,6 @@ router.get("/profile", tokenHelper.authenticateEntity, usersController.getUserPr
 router.put("/profile", tokenHelper.authenticateEntity, usersController.updateUserProfile);
 router.get("/reset-password", usersController.resetPassword);
 router.put("/update-password", usersController.updatePassword);
-
+router.get('/wallet', tokenHelper.authenticateEntity, usersController.getUserWalletBalance);
 
 module.exports = router;
-
-

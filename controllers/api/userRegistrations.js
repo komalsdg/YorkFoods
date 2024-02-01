@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const yup = require('yup');
+const yup = require("yup");
 
 const prisma = require("../../prismaClient");
 const tokenHelper = require("../../helpers/token");
@@ -16,7 +16,12 @@ module.exports.registerUser = async (req, res) => {
         passwordHash: bcrypt.hashSync(password, 10),
         cuisinePreference,
         authenticationToken: tokenHelper.createToken(email),
-      },
+        wallet: {
+          create: {
+            balance: 500,
+          },
+        },
+      }
     });
     res.json(newUser);
   } catch (error) {
