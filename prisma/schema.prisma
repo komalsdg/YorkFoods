@@ -26,6 +26,11 @@ enum Cuisine {
   null
 }
 
+enum reviewableType {
+  MENUITEM
+  RESTAURANT
+}
+
 model User {
   id                  Int      @id @default(autoincrement())
   email               String   @unique
@@ -39,20 +44,79 @@ model User {
   resetPasswordToken  String?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+  Orders              Order[]
+  Reviews             Review[]
 }
 
 model Restaurant {
-  id                  Int      @id @default(autoincrement())
-  email               String   @unique
-  passwordHash        String
-  name                String
-  subdomain           String   @unique
-  cuisineType         Cuisine? @default(null)
-  location            String
-  isVerified          Boolean  @default(false)
-  isBlocked           Boolean  @default(false)
+  id                 Int        @id @default(autoincrement())
+  email              String     @unique
+  passwordHash       String
+  name               String
+  subdomain          String     @unique
+  cuisineType        Cuisine?   @default(null)
+  location           String
+  isVerified         Boolean    @default(false)
+  isBlocked          Boolean    @default(false)
   authenticationToken String?
-  resetPasswordToken  String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  resetPasswordToken String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  deletedAt          DateTime?
+  menuItems          MenuItem[]
+  Orders             Order[]
+}
+
+model MenuItem {
+  id                Int       @id @default(autoincrement())
+  restaurantId      Int
+  name              String
+  description       String?
+  price             Float
+  quantity          Int
+  nutritionalValues Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  OrderItems        OrderItem[]
+
+  restaurant        Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
+model Order {
+  id           Int        @id @default(autoincrement())
+  userId       Int        
+  restaurantId Int        
+  totalPrice   Float
+  status       String
+  createdAt    DateTime   @default(now())
+  OrderItems   OrderItem[]
+
+  user         User       @relation(fields: [userId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int      
+  menuItemId Int      
+  quantity   Int
+  price      Float
+
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+}
+
+
+
+model Review {
+  id              Int      @id @default(autoincrement())
+  reviewableId    Int
+  reviewableType  reviewableType
+  userId          Int      
+  rating          Int
+  comment         String
+
+  User            User     @relation(fields: [userId], references: [id])
+
 }

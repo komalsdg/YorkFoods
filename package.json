@@ -189,6 +189,9 @@
   "scripts": {
     "start": "nodemon --inspect --watch server bin/www"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC"
