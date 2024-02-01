@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 const prisma = require("../../prismaClient");
 const {
@@ -6,6 +7,8 @@ const {
   passwordUpdateSchema,
 } = require("../../validations/users");
 const tokenHelper = require("../../helpers/token");
+
+const MEDICAL_DATA_PROVIDER_URL = "http://localhost:4000/medical-data";
 
 const getUsers = async (req, res) => {
   const allUsers = await prisma.user.findMany({
@@ -19,6 +22,29 @@ const getUsers = async (req, res) => {
   res.json(allUsers);
 };
 
+const fetchMedicalData = async (req, res) => {
+  try {
+    const email = req.entity.email;
+
+    const response = await axios.get(
+      `${MEDICAL_DATA_PROVIDER_URL}?email=${email}`
+    );
+
+    if (response.data) {
+      const updatedUser = await prisma.user.update({
+        where: { email },
+        data: { dieticianData: response.data },
+      });
+
+      res.json(updatedUser);
+    } else {
+      res.status(404).json({ message: "Nutritional data not found" });
+    }
+  } catch (error) {
+    console.error("Error updating dietician data:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};
 const getUserProfile = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -129,6 +155,7 @@ const updatePassword = async (req, res) => {
 
 module.exports = {
   getUsers,
+  fetchMedicalData,
   getUserProfile,
   updateUserProfile,
   resetPassword,

@@ -12,6 +12,7 @@
     "app-module-path": "^2.2.0",
     "array-flatten": "^1.1.1",
     "at-least-node": "^1.0.0",
+    "axios": "^1.6.7",
     "balanced-match": "^1.0.2",
     "bcrypt": "^5.1.1",
     "bluebird": "^3.7.2",
