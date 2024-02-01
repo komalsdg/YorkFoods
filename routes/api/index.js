@@ -7,6 +7,7 @@ const express = require('express');
  const sessions = require('./sessions');
 const menuItems = require('./menuItems');
 const orders = require('./orders');
+const review = require('./review');
 
  router.use('/users', users);
  router.use('/register', registrations);
@@ -14,5 +15,6 @@ const orders = require('./orders');
  router.use('/', sessions);
  router.use('/',menuItems);
  router.use('/',orders);
+ router.use('/',review);
 
  module.exports = router; 
