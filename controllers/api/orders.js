@@ -66,7 +66,7 @@ const insertOrder = async (req, res) => {
     });
 
     //Fetch user data
-    const userData = prisma.user.findUnique({
+    const userData = await prisma.user.findUnique({
       where: {
         id: parseInt(req.entity.id),
       },
@@ -82,7 +82,7 @@ const insertOrder = async (req, res) => {
       (item) => item.restaurantId === restaurantId
     );
     const itemCountMatches = menuItems.length === menuItemIds.length;
-    //calculate sum of nutritionalValues of menuitems and check if it is less than the user's preference limit
+
     if (!allItemsMatchRestaurant) {
       return res.status(400).send({
         error: "Not all menu items belong to the specified restaurant.",
@@ -100,42 +100,40 @@ const insertOrder = async (req, res) => {
           "Your order items's nutiritional values are greater than your prferenced dietition value",
       });
     }
-   
-      // Fix logic to calculate total price
-      // const totalPrice = menuItems.reduce((acc, currentItem) => {
-      //   const quantity = menuItemIds.find(item => item.menuItemId === currentItem.id).quantity;
-      //   return acc + (currentItem.price * quantity);
-      // }, 0);
 
-      const totalPrice = 100;
+    //calculate total price
+    const totalPrice = menuItemIds.reduce((acc, currentItem) => {
+      const menuItem = menuItems.find((item) => item.id === currentItem.menuItemId);
+      return acc + (menuItem.price * currentItem.quantity);
+    }, 0);
 
-      // Create order
-      const newOrder = await prisma.order.create({
-        data: {
-          userId: req.entity.id,
-          restaurantId,
-          totalPrice,
-          status: "created",
-        },
-      });
+    // Create order
+    const newOrder = await prisma.order.create({
+      data: {
+        userId: req.entity.id,
+        restaurantId,
+        totalPrice,
+        status: "created",
+      },
+    });
 
-      // Prepare order items data
-      const orderItemsData = menuItems.map((item) => ({
-        orderId: newOrder.id,
-        menuItemId: item.id,
-        quantity: menuItemIds.find((menuItem) => menuItem.menuItemId === item.id)
-          .quantity,
-        price: item.price,
-      }));
+    // Prepare order items data
+    const orderItemsData = menuItems.map((item) => ({
+      orderId: newOrder.id,
+      menuItemId: item.id,
+      quantity: menuItemIds.find((menuItem) => menuItem.menuItemId === item.id)
+        .quantity,
+      price: item.price,
+    }));
 
-      // Insert order items
-      const newOrderItems = await prisma.orderItem.createMany({
-        data: orderItemsData,
-        skipDuplicates: true,
-      });
+    // Insert order items
+    const newOrderItems = await prisma.orderItem.createMany({
+      data: orderItemsData,
+      skipDuplicates: true,
+    });
 
-      res.json({ order: newOrder, orderItemsCount: newOrderItems });
-    
+    res.json({ order: newOrder, orderItemsCount: newOrderItems });
+
   } catch (error) {
     console.error("Error in insertOrder:", error.message);
     res.status(500).send({ error: error.message });
@@ -149,18 +147,15 @@ function underPriscribedLimit(userData, menuItems) {
 
   if (menuItems && userData) {
 
-    console.log(userData);
     const menuItemsSum = menuItems.reduce((sum, item) => {
       return {
         protein: sum.protein + item.nutritionalValues.protein,
         calories: sum.calories + item.nutritionalValues.calories,
       };
     }, { protein: 0, calories: 0 });
-
     const userDataSum = userData.dieticianData;
 
     result = menuItemsSum.protein < userDataSum.protein && menuItemsSum.calories < userDataSum.calories;
-
   }
 
   return result;
