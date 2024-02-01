@@ -54,7 +54,7 @@ const getRestaurantsOrders = async (req, res) => {
 const insertOrder = async (req, res) => {
   try {
     await orderSchema.validate(req.body, { stripUnknown: true });
-
+debugger;
     const { restaurantId, menuItemIds } = req.body;
 
     // Fetch menu items to validate they belong to the same restaurant
@@ -71,14 +71,23 @@ const insertOrder = async (req, res) => {
       (item) => item.restaurantId === restaurantId
     );
     const itemCountMatches = menuItems.length === menuItemIds.length;
+    //calculate sum of nutritionalValues of menuitems and check if it is less than the user's preference limit
+
     if (!allItemsMatchRestaurant) {
       return res.status(400).send({
         error: "Not all menu items belong to the specified restaurant.",
       });
-    } else if (!itemCountMatches) {
+    }
+    else if (!itemCountMatches) {
       return res.status(400).send({
         error:
           "The number of items passed does not match the number of items available.",
+      });
+    }
+    else if (!underPriscribedLimit){
+      return res.status(400).send({
+        error:
+          "Your order items's nutiritional values are greater than your prferenced dietition value",
       });
     }
 
@@ -121,6 +130,31 @@ const insertOrder = async (req, res) => {
     res.status(500).send({ error: error.message });
   }
 };
+
+function underPriscribedLimit(userId, menuItems) {
+  let result;
+  const userData = prisma.user.findUnique({
+    where: {
+      id: parseInt(userId),
+    },
+    select: {
+      id: true,
+      dieticianData: true,
+    },
+  });
+
+  if (menuItems && userData) {
+    const menuItemsSum = menuItems.reduce((sum, item) => {
+      return sum + item.nutritionalValues;
+    }, 0);
+    const userDataSum = userData.dieticianData.reduce((sum, value) => {
+      return sum + value;
+    }, 0);
+    result = menuItemsSum < userDataSum;
+  }
+
+  return result;
+}
 
 //update order status by restautantid
 const updateOrderStatus = async (req, res) => {
