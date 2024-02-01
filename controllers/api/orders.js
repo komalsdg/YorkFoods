@@ -16,7 +16,7 @@ const getUserOrders = async (req, res) => {
         restaurantId: true,
         totalPrice: true,
         status: true,
-        OrderItems:true,
+        OrderItems: true,
       },
       where: {
         userId: user.id,
@@ -31,6 +31,7 @@ const getUserOrders = async (req, res) => {
 
 //insert order
 const insertOrder = async (req, res) => {
+  let newOrder;
   try {
     const {
       userId,
@@ -40,22 +41,35 @@ const insertOrder = async (req, res) => {
     } = req.body;
     await orderSchema.validate(req.body, { stripUnknown: false });
     //order
-    const newOrder = await prisma.order.create({
+    newOrder = await prisma.order.create({
       data: {
         userId: req.entity.id,
         restaurantId,
         totalPrice,
-        status:'created'
+        status: 'created'
       },
     });
-    //orderitem
+  } catch (error) {
+    console.log("Error in insertOrder", error.message);
+    res.status(500).send({ error: error.message });
+  }
+  try {
+
+    // Adding a orderID to every list
+    const orderId = 'OrderID';
+    const orderValue = newOrder.orderId;
+
+    for (const data of data_list) {
+      data[orderId] = orderValue;
+    }
+    //orderitem insert
     const newOrderItems = await prisma.orderitem.createMany({
-        data: orderItems,
-        skipDuplicates: true
+      data: orderItems,
+      skipDuplicates: true
     });
     res.json(newOrder);
   } catch (error) {
-    console.log("Error in insertOrder", error.message);
+    console.log("Error in insertOrderItem", error.message);
     res.status(500).send({ error: error.message });
   }
 };
