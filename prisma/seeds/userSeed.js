@@ -19,6 +19,11 @@ async function seedUsers() {
     const authenticationToken = tokenHelper.createToken(email);
     const hashedPassword = bcrypt.hashSync(password, 10);
 
+    const dieticianData = {
+      calories: Math.floor(Math.random() * (2500 - 1500 + 1)) + 1500,
+      protein: Math.floor(Math.random() * (100 - 50 + 1)) + 50,
+    };
+
     await prisma.user.create({
       data: {
         email,
@@ -26,6 +31,7 @@ async function seedUsers() {
         passwordHash: hashedPassword,
         cuisinePreference,
         authenticationToken,
+        dieticianData,
       },
     });
   }
