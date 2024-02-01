@@ -10,15 +10,17 @@ const menuItemsIndex = client.initIndex("menu_items_data_index");
 
 const search = async (req, res) => {
   try {
-    const query = req.query.searchTerm.toString || "";
-    const cuisine = req.query.cuisineType.toString || "";
+    const query = req.query.searchTerm?.toString() || "";
+    const cuisine = req.query.cuisineType?.toString() || "";
+
+    const filter = `cuisineType:${cuisine}`;
 
     const menuItems = await menuItemsIndex.search(query, {
       filters: "nutritionalValues.calories > 780",
     });
 
-    const restaurants = await restaurantIndex.search(query, {
-      filters: "cuisineType:CHINESE",
+    const restaurants = await restaurantIndex.search("", {
+      filters: filter,
     });
 
     res.json({ menuItems, restaurants });
