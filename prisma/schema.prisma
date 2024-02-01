@@ -120,5 +120,3 @@ model Review {
   User            User     @relation(fields: [userId], references: [id])
 
 }
-
-
