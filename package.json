@@ -188,7 +188,10 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "start": "nodemon --inspect --watch server bin/www"
+    "start": "nodemon --inspect bin/www"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",
